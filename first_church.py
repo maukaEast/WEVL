@@ -6,6 +6,7 @@ https://datascientyst.com/compare-two-pandas-dataframes-get-differences/
 https://stackoverflow.com/questions/20225110/comparing-two-dataframes-and-getting-the-differences
 https://www.geeksforgeeks.org/how-to-compare-two-dataframes-with-pandas-compare/
 
+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
 '''
 import requests
 import pandas as pd
@@ -75,8 +76,7 @@ def episode_details(inp_url):
 			#except:
 			#	pass
 	#print (" -- -- ")
-	#DBase = pd.concat([DBase, pd.DataFrame([tmp])])
-	#print(DBase)
+	
 '''	 
   with open('bored.txt','w') as my_list_file:
 		file_content = '\n'.join(episode_list)
