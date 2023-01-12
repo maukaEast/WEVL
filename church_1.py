@@ -53,7 +53,7 @@ def episode_details(inp_url):
 # MAIN FUNCTION
 prefix = "https://spinitron.com/WEVL/show/113358/The-1st-Church-of-Rock?page="
 page = 1
-while page !=2:
+while page !=3:
 	count=str(page)
 	url = prefix+count
 	page = page+1
