@@ -5,7 +5,7 @@ https://stackoverflow.com/questions/71545135/how-to-append-rows-with-concat-to-a
 https://datascientyst.com/compare-two-pandas-dataframes-get-differences/
 https://stackoverflow.com/questions/20225110/comparing-two-dataframes-and-getting-the-differences
 https://www.geeksforgeeks.org/how-to-compare-two-dataframes-with-pandas-compare/
-
+https://www.statology.org/pandas-check-if-row-is-in-another-dataframe/
 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
 '''
 import requests
@@ -22,7 +22,6 @@ episode_list = []
 global DBase
 global Indielist
 
-
 def page_search(inp_url):
 	global quote_list
 	global index
@@ -32,7 +31,7 @@ def page_search(inp_url):
 		
 	site_inp=inp_url
 	thesite = requests.get(site_inp)
-	souper =  BeautifulSoup(thesite.content, "html.parser")
+	souper =  BeautifulSoup(thesite.content, "lxml")
 	show = souper.find_all("div", class_="block")
 	for link in show:
 		thelink = str('https://spinitron.com/'+link.find(class_='link').get('href'))
@@ -97,6 +96,20 @@ def format_monkey():
 	Indielist = Indielist.drop(['Rating','Bitrate','Genre','Length','Path','Media'],axis=1)
 	print(Indielist)
 
+def compare_monkey():
+	global Fulllist
+	global Heavylist
+	list_headings = ["Artist","Title","Album","Year"]
+	
+	Fulllist = pd.read_csv("test_list.csv",sep = ';')
+	Heavylist = pd.read_csv("sm_list.csv",sep = ';')
+	all_df = pd.merge(Fulllist, Heavylist, on="Title", how='left', indicator='exists')
+	all_df['exists'] = np.where(all_df.exists == 'both', True, False)
+	
+	print("comparing csvs")
+	print(all_df)
+	
+	
 # MAIN FUNCTION
 panda_make()
 
@@ -113,6 +126,7 @@ while page !=2:
 	page = page+1
 	page_search(url)
 print("scrape complete")
+compare_monkey()
 
 '''
 '''
