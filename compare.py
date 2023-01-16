@@ -16,38 +16,38 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 #- - setup variables and global uses
-global Fulllist
-global Heavylist
+global Fullzig
+global Indiezig
 
 def compare_monkey():
-	global Fulllist
-	global Heavylist
-	list_headings = ["artist","title","album","year","exists"]
+	global Fullzig
+	global Indiezig
 	new_df = pd.DataFrame()
 	
-	Fulllist = pd.read_csv("test_list.csv",sep = ';')
-	Heavylist = pd.read_csv("sm_list.csv",sep = ';')
+	Fullzig = pd.read_csv("fullziggy.csv")
+	Fullzig = (Fullzig.replace(',','.', regex=True))
+	Fullzig = Fullzig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
+	Fullzig.insert(0, 'show_date', '001100')
+	Fullzig['show_date']=Fullzig['show_date'].astype(str)
+	#Fullzig.drop(Fullzig.columns[0], axis=1, inplace=True)
+	
+	Indiezig = pd.read_csv("offthe_recent.csv",sep=';')
+	Indiezig.drop(Indiezig.columns[0], axis=1, inplace=True)
+	#format ziggy lists
+		
+	#Indiezig = Indiezig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
+	print(Indiezig.columns.tolist())
+	print(Fullzig.columns.tolist())	
 	#merage and compare both lists
-	all_df = pd.merge(Fulllist, Heavylist, on=["title","artist","year","album"], how='left', indicator='exists')
+	all_df = pd.merge(Fullzig, Indiezig, on=['show_date', 'Title','Artist','Album','Year'], how='left', indicator='exists')
+
+#add column to show if each row in first DataFrame exists in second
 	all_df['exists'] = np.where(all_df.exists == 'both', True, False)
-	#create list with just songs not on smaller list
-	new_df= all_df.loc[all_df['exists'] == False]
-	#remove comparison column and add placeholder for episode airdate
-	new_df = new_df.drop(['exists'],axis=1)
-	new_df.insert(0, 'play_date', '0_UNK_0')
-	
-	
+	new_df = all_df[all_df['exists']==True]
+	#drop assists columns
+	#all_df = all_df.drop('exists', axis=1)
 	print("comparing csvs")
 	new_df.to_csv('comparison.csv',sep=';')
 	
-	#with open('comparison.txt','w') as my_list_file:
-	#	file_content = '\n'.join(all_df)
-	#	my_list_file.write(file_content)
-		
-	print(new_df)
-	
 # MAIN FUNCTION
 compare_monkey()
-
-'''
-'''
