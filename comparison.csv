@@ -1,24 +1,3 @@
-;show_date;Artist;Title;Album;Year;exists
-273;001100;A Tribe Called Quest;Word Play;Beats. Rhymes And Life;1996;True
-274;001100;A Tribe Called Quest;Stressed Out;Beats. Rhymes And Life;1996;True
-275;001100;A Tribe Called Quest;Stressed Out (feat. Faith Evans);Beats. Rhymes And Life;1996;True
-276;001100;A Tribe Called Quest;Start It Up;The Love Movement;1998;True
-277;001100;A Tribe Called Quest;Find A Way;The Love Movement;1998;True
-278;001100;A Tribe Called Quest;Da Booty;The Love Movement;1998;True
-279;001100;A Tribe Called Quest;Steppin' It Up;The Love Movement;1998;True
-280;001100;A Tribe Called Quest;Like It Like That;The Love Movement;1998;True
-281;001100;A Tribe Called Quest;Common Ground (Get It Goin' On);The Love Movement;1998;True
-282;001100;A Tribe Called Quest;4 Moms (feat. Spanky);The Love Movement;1998;True
-283;001100;A Tribe Called Quest;His Name Is Mutty Ranks;The Love Movement;1998;True
-284;001100;A Tribe Called Quest;Give Me (feat. Noreaga);The Love Movement;1998;True
-285;001100;A Tribe Called Quest;Pad & Pen (feat. D-Life);The Love Movement;1998;True
-286;001100;A Tribe Called Quest;Busta's Lament;The Love Movement;1998;True
-287;001100;A Tribe Called Quest;Hot 4 U;The Love Movement;1998;True
-288;001100;A Tribe Called Quest;Against The World;The Love Movement;1998;True
-289;001100;A Tribe Called Quest;The Love;The Love Movement;1998;True
-290;001100;A Tribe Called Quest;Rock Rock Y'all (feat. Punchline. Wordsworth. Jane Doe & Mos Def);The Love Movement;1998;True
-291;001100;A Tribe Called Quest;Scenario (Remix);The Love Movement Bonus CD;1998;True
-292;001100;A Tribe Called Quest;Money Maker;The Love Movement Bonus CD;1998;True
-293;001100;A Tribe Called Quest;Hot Sex;The Love Movement Bonus CD;1998;True
-294;001100;A Tribe Called Quest;Oh My God (Remix);The Love Movement Bonus CD;1998;True
-295;001100;A Tribe Called Quest;Jazz (We´ve Got) (Re-Recording);The Love Movement Bonus CD;1998;True
+;show_date;Artist;Title;Album;Year_x;Year_y;exists
+0;Jan 15. 2023;Portugal. The Man;Modern Jesus;Evil Friends;2013;2013;True
+1;Jan 15. 2023;The Shins;Young Pilgrims;Chutes Too Narrow;2003;2003;True
