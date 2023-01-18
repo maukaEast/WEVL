@@ -16,11 +16,8 @@ from bs4 import BeautifulSoup
 pd.set_option('display.width', 1000)
 
 #- - setup variables and global uses
-episode_list = []
 global DBase
-global Indielist
 global Fulllist
-global Heavylist
 global Fullzig
 global Indiezig
 
@@ -86,10 +83,9 @@ def compare_monkey():
 	Fullzig = pd.read_csv("formziggy.csv",sep=';')
 	Fullzig = (Fullzig.replace(',','.', regex=True))
 	#Fullzig = Fullzig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
-	#Fullzig.insert(0, 'show_date', '001100')
+	#Fullzig.insert(0, '', '001100')
 	Fullzig['show_date']=Fullzig['show_date'].astype(str)
 	Fullzig['Year']=Fullzig['Year'].astype(str)
-
 	#Fullzig.drop(Fullzig.columns[0], axis=1, inplace=True)
 	
 	Indiezig = pd.read_csv("offthe_recent.csv",sep=';')
@@ -100,21 +96,24 @@ def compare_monkey():
 	Indiezig.to_csv('offthe_recent.csv',sep=';')
 		
 	#Indiezig = Indiezig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
-	print(Indiezig.columns.tolist())
-	print(Indiezig.dtypes)
-	print(Fullzig.columns.tolist())	
-	print(Fullzig.dtypes)
+	ind_list = Indiezig.columns.tolist()
+	zig_list = Fullzig.columns.tolist()	
 	#merage and compare both lists
-	all_df = pd.merge(Fullzig, Indiezig, on=['show_date', 'Title','Artist','Album'], how='left', indicator='exists')
-
+	all_df = pd.merge(Fullzig, Indiezig, on=['Title','Artist','Album'], how='left', indicator='exists')
+	all_df.to_csv('allcompared.csv',sep=';',index=False)
 #add column to show if each row in first DataFrame exists in second
-	all_df['exists'] = np.where(all_df.exists == 'both', True, False)
-	new_df = all_df[all_df['exists']==True]
+	all_df['exists'] = np.where(all_df.exists == 'right_only', True, False)
+	new_df = all_df.copy()
+	new_df = new_df[new_df['exists']==True]
 	#drop assists columns
-	#all_df = all_df.drop('exists', axis=1)
+	#new_df = new_df.drop('exists', axis=1)
+	new_df.drop(['show_date_x','Year_x','Year_y'], axis=1,inplace=True)
+	new_df.drop(new_df.columns[[0]], axis=1, inplace=True)
+	new_df.rename(columns = {'show_date_y':'Show Date'},inplace=True)
+	new_df = new_df.loc[:,['Show Date', 'Title',"Artist","Album","exists"]]
 	print("comparing csvs")
 	#Fullzig.to_csv('formziggy.csv',sep=';')
-	new_df.to_csv('comparison.csv',sep=';')
+	new_df.to_csv('comparison.csv',sep=';',index=False)
 	
 # MAIN FUNCTION
 panda_make()
@@ -131,7 +130,7 @@ while page !=2:
 	count=str(page)
 	url = prefix+count
 	page = page+1
-	page_search(url)
+	#page_search(url)
 print("scrape complete")
 
 compare_monkey()
