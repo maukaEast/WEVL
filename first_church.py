@@ -80,6 +80,8 @@ def compare_monkey():
 	global Indiezig
 	new_df = pd.DataFrame()
 	
+	#this is formatted list of all tracks on ziggy.
+	#in merge/compare it's the "left" list
 	Fullzig = pd.read_csv("formziggy.csv",sep=';')
 	Fullzig = (Fullzig.replace(',','.', regex=True))
 	#Fullzig = Fullzig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
@@ -98,19 +100,22 @@ def compare_monkey():
 	#Indiezig = Indiezig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
 	ind_list = Indiezig.columns.tolist()
 	zig_list = Fullzig.columns.tolist()	
-	#merage and compare both lists
-	all_df = pd.merge(Fullzig, Indiezig, on=['Title','Artist','Album'], how='left', indicator='exists')
+	
+	#merage and compare both lists. fullzig is 'left', indie is 'right', compares on shared columns ('on='). 'how=right' -> keep results from Indielist
+	all_df = pd.merge(Fullzig, Indiezig, on=['Title','Artist','Album'], how='right', indicator='exists')
 	all_df.to_csv('allcompared.csv',sep=';',index=False)
 #add column to show if each row in first DataFrame exists in second
 	all_df['exists'] = np.where(all_df.exists == 'right_only', True, False)
 	new_df = all_df.copy()
+#create output dataframe which only contains the output where track exists in indie but not ziggy
 	new_df = new_df[new_df['exists']==True]
-	#drop assists columns
-	#new_df = new_df.drop('exists', axis=1)
+#clean up new frame
+	new_df = new_df.drop('exists', axis=1)
 	new_df.drop(['show_date_x','Year_x','Year_y'], axis=1,inplace=True)
 	new_df.drop(new_df.columns[[0]], axis=1, inplace=True)
 	new_df.rename(columns = {'show_date_y':'Show Date'},inplace=True)
-	new_df = new_df.loc[:,['Show Date', 'Title',"Artist","Album","exists"]]
+	new_df = new_df.loc[:,['Show Date', 'Title','Artist','Album']]
+	new_df = (new_df.replace('\.',',', regex=True))
 	print("comparing csvs")
 	#Fullzig.to_csv('formziggy.csv',sep=';')
 	new_df.to_csv('comparison.csv',sep=';',index=False)
