@@ -17,9 +17,8 @@ pd.set_option('display.width', 1000)
 
 #- - setup variables and global uses
 global DBase
-global Fulllist
 global Fullzig
-global Indiezig
+global scraped_list
 
 def page_search(inp_url):
 	print("---- ----- -----")
@@ -66,7 +65,7 @@ def episode_details(inp_url):
 				#DBase = DBase.drop(DBase.columns[0],axis=1)
 			except:
 				pass
-			DBase.to_csv('offthe_recent.csv',sep=';')
+			DBase.to_csv('first_church_recent.csv',sep=';')
 			#print (DBase)
 
 def panda_make():
@@ -77,38 +76,36 @@ def panda_make():
    
 def compare_monkey():
 	global Fullzig
-	global Indiezig
-	new_df = pd.DataFrame()
+	global scraped_list
 	
-	#this is formatted list of all tracks on ziggy.
-	#in merge/compare it's the "left" list
+#List of all tracks on ziggy. depending on source, may need further formatting
 	Fullzig = pd.read_csv("formziggy.csv",sep=';')
 	Fullzig = (Fullzig.replace(',','.', regex=True))
-	#Fullzig = Fullzig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
-	#Fullzig.insert(0, '', '001100')
 	Fullzig['show_date']=Fullzig['show_date'].astype(str)
 	Fullzig['Year']=Fullzig['Year'].astype(str)
-	#Fullzig.drop(Fullzig.columns[0], axis=1, inplace=True)
-	
-	Indiezig = pd.read_csv("offthe_recent.csv",sep=';')
-	Indiezig['show_date']=Indiezig['show_date'].astype(str)
-	Indiezig['Year']=Indiezig['Year'].astype(str)
-	Indiezig.drop(Indiezig.columns[0], axis=1, inplace=True)
-	#Indiezig.drop(Indiezig.columns[0], axis=1, inplace=True)
-	Indiezig.to_csv('offthe_recent.csv',sep=';')
+#Fullzig.drop(Fullzig.columns[0], axis=1, inplace=True)
+#Fullzig = Fullzig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
+#Fullzig.insert(0, '', '001100')	
+
+#List made from scraped playlists. May need formatting to gel	
+	scraped_list = pd.read_csv("first_church_recent.csv",sep=';')
+	#scraped_list = scraped_list.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
+	scraped_list['show_date']=scraped_list['show_date'].astype(str)
+	scraped_list['Year']=scraped_list['Year'].astype(str)
+	scraped_list.drop(scraped_list.columns[0], axis=1, inplace=True)
+	scraped_list.to_csv('first_church_recent.csv',sep=';')
 		
-	#Indiezig = Indiezig.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
-	ind_list = Indiezig.columns.tolist()
+	ind_list = scraped_list.columns.tolist()
 	zig_list = Fullzig.columns.tolist()	
 	
-	#merage and compare both lists. fullzig is 'left', indie is 'right', compares on shared columns ('on='). 'how=right' -> keep results from Indielist
-	all_df = pd.merge(Fullzig, Indiezig, on=['Title','Artist','Album'], how='right', indicator='exists')
+#merage and compare both lists. fullzig is 'left', scraped_list is 'right', compares on shared columns ('on='). 'how=right' -> keep results from scraped_list. change this to get different result list contents
+	all_df = pd.merge(Fullzig, scraped_list, on=['Title','Artist','Album'], how='right', indicator='exists')
 	all_df.to_csv('allcompared.csv',sep=';',index=False)
 #add column to show if each row in first DataFrame exists in second
 	all_df['exists'] = np.where(all_df.exists == 'right_only', True, False)
 	new_df = all_df.copy()
-#create output dataframe which only contains the output where track exists in indie but not ziggy
-	new_df = new_df[new_df['exists']==True]
+#create output frame which only contains the output where track exists in scraped but not ziggy
+	new_df = new_df[new_df['exists']==False]
 #clean up new frame
 	new_df = new_df.drop('exists', axis=1)
 	new_df.drop(['show_date_x','Year_x','Year_y'], axis=1,inplace=True)
@@ -116,8 +113,8 @@ def compare_monkey():
 	new_df.rename(columns = {'show_date_y':'Show Date'},inplace=True)
 	new_df = new_df.loc[:,['Show Date', 'Title','Artist','Album']]
 	new_df = (new_df.replace('\.',',', regex=True))
+	new_df.drop_duplicates(keep='first',inplace=True)
 	print("comparing csvs")
-	#Fullzig.to_csv('formziggy.csv',sep=';')
 	new_df.to_csv('comparison.csv',sep=';',index=False)
 	
 # MAIN FUNCTION
@@ -127,15 +124,15 @@ against ="https://spinitron.com/WEVL/show/113415/Against-The-Grain?page="
 offthe = "https://spinitron.com/WEVL/show/113436/Off-The-Record?page="
 church = "https://spinitron.com/WEVL/show/113358/The-1st-Church-of-Rock?page="
 
-prefix = offthe
+prefix = church
 
 page = 1
 
-while page !=2:
+while page !=4:
 	count=str(page)
 	url = prefix+count
 	page = page+1
-	#page_search(url)
+	page_search(url)
 print("scrape complete")
 
 compare_monkey()
