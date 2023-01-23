@@ -35,7 +35,7 @@ def episode_details(inp_url):
 	global DBase
 	print('')
 	print(inp_url)
-	
+	the_show_tags = []
 	show_details = requests.get(inp_url)
 	showsoup =  BeautifulSoup(show_details.content.decode('utf-8'), "lxml")
 	showdate = (showsoup.find('p', class_='timeslot').text).lstrip()[:12]
@@ -53,7 +53,8 @@ def episode_details(inp_url):
 				album = tracks.find(class_='release').text
 				album = album.replace(',','.')
 				date = tracks.find(class_='released').text
-				#print(artist+'  '+song+'   '+album+'  '+date)
+				tag_string = artist+'  '+song+'   '+album+'  '+date
+				print(tag_string)
 				dict = {"show_date":showdate,
 						"Artist":artist,
 						"Title":song,
@@ -61,11 +62,17 @@ def episode_details(inp_url):
 						"Year":date             
 					}
 				print(dict)
+				the_show_tags.append(tag_string)
+				
 				DBase = pd.concat([DBase, pd.DataFrame([dict])])
 				#DBase = DBase.drop(DBase.columns[0],axis=1)
 			except:
 				pass
-			DBase.to_csv('first_church_recent.csv',sep=';')
+			DBase.to_csv('offthe_recent.csv',sep=';')
+			file=open(showdate+'_tags.txt','w')
+			for items in the_show_tags:
+				file.writelines(items+'\n')
+			file.close()
 			#print (DBase)
 
 def panda_make():
@@ -88,12 +95,12 @@ def compare_monkey():
 #Fullzig.insert(0, '', '001100')	
 
 #List made from scraped playlists. May need formatting to gel	
-	scraped_list = pd.read_csv("first_church_recent.csv",sep=';')
+	scraped_list = pd.read_csv("offthe_recent.csv",sep=';')
 	#scraped_list = scraped_list.drop(['Length','Genre','Rating','Bitrate','Path','Media'],axis=1)
 	scraped_list['show_date']=scraped_list['show_date'].astype(str)
 	scraped_list['Year']=scraped_list['Year'].astype(str)
 	scraped_list.drop(scraped_list.columns[0], axis=1, inplace=True)
-	scraped_list.to_csv('first_church_recent.csv',sep=';')
+	scraped_list.to_csv('offthe_recent.csv',sep=';')
 		
 	ind_list = scraped_list.columns.tolist()
 	zig_list = Fullzig.columns.tolist()	
@@ -124,7 +131,7 @@ against ="https://spinitron.com/WEVL/show/113415/Against-The-Grain?page="
 offthe = "https://spinitron.com/WEVL/show/113436/Off-The-Record?page="
 church = "https://spinitron.com/WEVL/show/113358/The-1st-Church-of-Rock?page="
 
-prefix = church
+prefix = offthe
 
 page = 1
 
