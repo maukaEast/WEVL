@@ -14,10 +14,6 @@ eyed3.log.setLevel("ERROR")	#this disables known bug in eye3d error reporting
 mp3_list =[]
 show_DB = pd.DataFrame()
 
-def clean_list():		#create search exclusion criteria function
-	print("cleaning list of common elements")
-	bad = ['the','a','&']
-
 def list_contains(List1, List2):  #prog to check for cell contents
 #List 1 is full list, List2 is the search term list
 	print("Comparing lists")
@@ -29,11 +25,9 @@ def list_contains(List1, List2):  #prog to check for cell contents
 		#check that all terms in the band name are in for the presence of list2
 		setcheck = set(List2).issubset(art_terms)
 		if setcheck is True:
-			print("terms ",List2,"found in Artist column")
+			print("terms ",List2,"found in column")
 			return True 
-		#else: 
-			#return False
-		#	print("not found yet")
+
 main_scrape_list = "offthe_recent.csv"	#name the show database
 if main_scrape_list:					#if it exists, create a Pandas Frame for it
 	DBase = pd.read_csv('../'+main_scrape_list,sep=';',index_col=False)
