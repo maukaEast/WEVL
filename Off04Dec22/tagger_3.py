@@ -13,6 +13,7 @@ eyed3.log.setLevel("ERROR")	#this disables known bug in eye3d error reporting
 
 mp3_list =[]
 show_DB = pd.DataFrame()
+episode_DB = pd.DataFrame()
 
 def list_contains(List1, List2):  #prog to check for cell contents
 #List 1 is full list, List2 is the search term list
@@ -35,13 +36,14 @@ if main_scrape_list:					#if it exists, create a Pandas Frame for it
 	print("Scrape list accessed")
 else:
 	print("No file found for that show")
+
+# ---- MP3 file processing ---- #
 	
 all_files = os.listdir()
 for x in all_files:
 	if x.endswith('.mp3'):		#find and format each mp3 in the folder
 		mp3_list.append(x[:-4])
 		
-# ---- MP3 file processing ---- #
 for file in mp3_list:
 #look at each songfile in mp3 list and make search criteria from name omitting "a", "the", &c.
 	stopwords = ['a', 'and', '&', 'the']
@@ -49,30 +51,22 @@ for file in mp3_list:
 	print("Search parameters for "+file+" are:",contents)
 	if (list_contains(DBase['Artist'],contents)):
 		print("All terms found in column")
+		full_values = DBase[(DBase['Artist']==file) & (DBase['show_date']=="Dec 4. 2022 ")]
+		full_dict = full_values.to_dict()
+		print(full_dict)
+		episode_DB = pd.concat([episode_DB,full_values], axis=0,ignore_index=True)
 	else:
 		print("Not all terms found in 'Artist' column")
 
-#OLD LINE -> if DBase['Artist'].str.contains(file).any(): #<- which needs entire filename
-	for each in contents:
-#iterate over each entry in the selected artists' name
-		#print("Looking for term: "+each)
-#if found in the 'Artist' cell for the given showdate, add it to that date's DBase
-		if DBase['Artist'].str.contains(each,case=False).any():
-			the_values = DBase[(DBase['Artist']==file) & (DBase['show_date']=="Dec 4. 2022 ")]
-			#print(the_values) 
-			data_dict = the_values.to_dict()
-			#print(data_dict)
-			show_DB = pd.concat([show_DB,the_values], axis=0,ignore_index=True)			
-		else:
-			print("no details found for file: "+file)
 #print('')
 #print('final created database row number:')
-#print("\t"+str(show_DB.shape[0]))
+#print("\t"+str(episode_DB.shape[0]))
+#print(episode_DB)
+episode_DB.drop_duplicates(keep=False,inplace=True)
+episode_DB.to_csv('Dec04_22.csv',sep=';',index=False)
 
-show_DB.to_csv('Dec04_22.csv',sep=';',index=False)
-
-#checking for index of given row
-for i in range(0,show_DB.shape[0]):
+# --- TAGGING FUNCTION --- #
+for i in range(0,show_DB.shape[0]):	#checking for index of given row
 	to_tag_name = str(mp3_list[i])
 	to_tag_file = to_tag_name+'.mp3'
 	#print("File data for "+to_tag_file+" at index "+str(i))
