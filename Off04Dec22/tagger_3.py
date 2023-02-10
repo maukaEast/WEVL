@@ -28,7 +28,17 @@ def list_contains(List1, List2):  #prog to check for cell contents
 		if setcheck is True:
 			#print("terms ",List2,"found in column")
 			return True 
-
+def clear_tags():
+	audiofile = eyed3.load(to_tag_file)
+	audiofile.tag.artist = "UNK"
+	audiofile.tag.album = "UNK"
+	audiofile.tag.album_artist = "UNK"
+	audiofile.tag.title = "UNK"
+	audiofile.tag.genre = "UNK"
+		#audiofile.tag.release-year = show_date
+	audiofile.tag.save()
+	print("Tags Cleared")
+	
 main_scrape_list = "offthe_recent.csv"	#name the show database
 if main_scrape_list:					#if it exists, create a Pandas Frame for it
 	DBase = pd.read_csv('../'+main_scrape_list,sep=';',index_col=False)
@@ -66,18 +76,19 @@ episode_DB.drop_duplicates(keep=False,inplace=True)
 episode_DB.to_csv('Dec04_22.csv',sep=';',index=False)
 
 # --- TAGGING FUNCTION --- #
-for i in range(0,show_DB.shape[0]):	#checking for index of given row
+#looking at main DB. possible why are getting doubles
+for i in range(0,episode_DB.shape[0]):	#checking for index of given row
 	to_tag_name = str(mp3_list[i])
 	to_tag_file = to_tag_name+'.mp3'
 	#print("File data for "+to_tag_file+" at index "+str(i))
 	#print('')
 	#print("Attempting to tag "+to_tag_file)
 	#print("from database"+str(show_DB.iloc[i]))
-	if show_DB.iloc[i]['Artist']== to_tag_name:
-		show_artist = show_DB.iloc[i]['Artist']
-		show_title = show_DB.iloc[i]['Title']
-		show_album = show_DB.iloc[i]['Album']
-		show_date = show_DB.iloc[i]['Year']
+	if episode_DB.iloc[i]['Artist']== to_tag_name:
+		show_artist = episode_DB.iloc[i]['Artist']
+		show_title = episode_DB.iloc[i]['Title']
+		show_album = episode_DB.iloc[i]['Album']
+		show_date = episode_DB.iloc[i]['Year']
 		
 		audiofile = eyed3.load(to_tag_file)
 		audiofile.tag.artist = show_artist
