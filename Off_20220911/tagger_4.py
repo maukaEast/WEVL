@@ -19,19 +19,18 @@ episode_DB = pd.DataFrame()
 
 def list_contains(shortList, bigList):  #function to check if all items in one list are in another
 	print(shortList)
-	big_list = bigList.tolist()	#<- turn column into a list to iterate
-	#for words in shortList:	#<- for each of small lists names
-	art_terms = words.split()	#make list entry a list of substrings
-	art_terms = list(map(str.lower,art_terms))
-	print("Searching for",art_terms,"in full show list")
+	#big_list = bigList.tolist()	#<- turn column into a list to iterate
+	for words in shortList:	#<- for each of small lists names
+		art_terms = words.split()	#make list entry a list of substrings
+		art_terms = list(map(str.lower,art_terms))
+		print("Searching for",art_terms,"in full show list")
 	#check that all terms in the band name are in for the presence of list2
-	setcheck = set(art_terms).issubset(big_list)
-	if setcheck is True:
-		print("term found in List")
-		return True 
-	else:
-		print("term not found in full show list")
-		return False
+		setcheck = set(art_terms).issubset(bigList)
+		if setcheck is True:
+			print("All terms in List")
+			return True 
+		else:
+			print("All terms not found in full show list")
 			
 def clear_tags():
 	audiofile = eyed3.load(to_tag_file)
@@ -79,10 +78,14 @@ for file in mp3_list:
 	#print(DBase['Artist'])
 	#https://www.statology.org/pandas-get-index-of-row/
 	for each in art_contents:
+		Base_Art = list(DBase["Artist"])
+		print(art_contents)
+		print(Base_Art[0])
+		print(list_contains(Base_Art,art_contents))
 		if (DBase['Artist'].str.contains(each,case=False).any()):
 			print("artist name found as",each)
 			found_artist = DBase.loc[DBase['Artist'].str.contains(each, case=False)]
-			print(found_thing)
+			#print(found_artist)
 			
 		#print(DBase['Artist'],DBase['Title'])
 		#	tit_index = DBase.index[DBase['Title'] == file_tit].tolist()
