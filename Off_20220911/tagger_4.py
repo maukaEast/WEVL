@@ -18,19 +18,26 @@ show_DB = pd.DataFrame()
 episode_DB = pd.DataFrame()
 
 def list_contains(shortList, bigList):  #function to check if all items in one list are in another
-	print(shortList)
-	#big_list = bigList.tolist()	#<- turn column into a list to iterate
-	for words in shortList:	#<- for each of small lists names
-		art_terms = words.split()	#make list entry a list of substrings
-		art_terms = list(map(str.lower,art_terms))
-		print("Searching for",art_terms,"in full show list")
-	#check that all terms in the band name are in for the presence of list2
-		setcheck = set(art_terms).issubset(bigList)
-		if setcheck is True:
-			print("All terms in List")
-			return True 
-		else:
-			print("All terms not found in full show list")
+	print("Search criteria",shortList)
+	lowList = [x.lower() for x in bigList]
+	stopwords = ["a", "and", "&", "_", "in", "the"]
+	#low_contents = list(filter(lambda w: w not in stopwords, re.split(" ", lowList.lower())))
+	low_contents = [word for word in lowList if word not in stopwords]
+	with open(r'bigList.txt', 'w') as doc:
+			for item in low_contents:
+				doc.write("%s\n" % item)
+	for names in lowList:
+		for words in shortList:	#<- for each of small lists names
+			art_terms = words.split()	#make list entry a list of substrings
+			print("using",words)
+			art_terms = list(map(str.lower,art_terms))
+			print("Searching for",words,"in",names)
+			if(set(words).issubset(set(names))):
+				print("list is subset")
+				break
+			#else:
+			#	print("No subset found")
+	print("Comparison completed")
 			
 def clear_tags():
 	audiofile = eyed3.load(to_tag_file)
@@ -79,9 +86,9 @@ for file in mp3_list:
 	#https://www.statology.org/pandas-get-index-of-row/
 	for each in art_contents:
 		Base_Art = list(DBase["Artist"])
-		print(art_contents)
-		print(Base_Art[0])
-		print(list_contains(Base_Art,art_contents))
+		#print(art_contents)
+		#print(Base_Art[0])
+		print(list_contains(art_contents,Base_Art))
 		if (DBase['Artist'].str.contains(each,case=False).any()):
 			print("artist name found as",each)
 			found_artist = DBase.loc[DBase['Artist'].str.contains(each, case=False)]
