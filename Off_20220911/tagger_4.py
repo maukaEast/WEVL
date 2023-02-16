@@ -3,6 +3,7 @@ scripts to update audacity tags with data from scrape
 https://methodmatters.github.io/editing-id3-tags-mp3-meta-data-in-python/
 https://stackoverflow.com/questions/50575802/convert-dataframe-row-to-dict
 https://stackoverflow.com/questions/15147751/how-to-check-if-all-items-in-a-list-are-there-in-another-list
+#https://www.statology.org/pandas-get-index-of-row/
 '''
 import os
 import re
@@ -18,27 +19,37 @@ show_DB = pd.DataFrame()
 episode_DB = pd.DataFrame()
 
 def list_contains(shortList, bigList):  #function to check if all items in one list are in another
-	print("Search criteria",shortList)
+	listToStr = ' '.join([str(elem) for elem in shortList])
+	print("Search criteria: ",listToStr)
 	lowList = [x.lower() for x in bigList]
 	stopwords = ["a", "and", "&", "_", "in", "the"]
-	#low_contents = list(filter(lambda w: w not in stopwords, re.split(" ", lowList.lower())))
 	low_contents = [word for word in lowList if word not in stopwords]
 	with open(r'bigList.txt', 'w') as doc:
 			for item in low_contents:
 				doc.write("%s\n" % item)
 	for names in lowList:
-		for words in shortList:	#<- for each of small lists names
-			art_terms = words.split()	#make list entry a list of substrings
-			print("using",words)
-			art_terms = list(map(str.lower,art_terms))
-			print("Searching for",words,"in",names)
-			if(set(words).issubset(set(names))):
-				print("list is subset")
-				break
-			#else:
-			#	print("No subset found")
+		print("Checking if",listToStr,"is a subset of",names)
+		print(lowList.index(names))
+		if(set(listToStr).issubset(set(names))):
+			print("Confirming that",listToStr,"is subset of the main list")
+			break
+		#else:
+		#	print("No subset found")
+		#break	#exits loops when found.
 	print("Comparison completed")
-			
+# ---- MP3 file processing function ---- #
+def get_mp3s():
+	all_files = os.listdir()
+	cur_dir = os.getcwd().rsplit('\\',1)[-1]
+	print("Show date:",cur_dir)
+	print("")
+
+	for x in all_files:
+		if x.endswith('.mp3'):		#find and format each mp3 in the folder
+			mp3_list.append(x[:-4])
+			df = pd.DataFrame(data={"FileNames": mp3_list})
+			df.to_csv(cur_dir+"mp3s.csv", sep=',',index=False)
+# -- Utility to clear tags of all present MP3s in folder -- #			
 def clear_tags():
 	audiofile = eyed3.load(to_tag_file)
 	audiofile.tag.artist = "UNK"
@@ -49,7 +60,8 @@ def clear_tags():
 		#audiofile.tag.release-year = show_date
 	audiofile.tag.save()
 	print("Tags Cleared")
-	
+
+# -- main program functions
 main_scrape_list = "offthe_recent.csv"	#name the show database
 if main_scrape_list:					#if it exists, create a Pandas Frame for it
 	DBase = pd.read_csv('../'+main_scrape_list,sep=';',index_col=False)
@@ -59,19 +71,7 @@ if main_scrape_list:					#if it exists, create a Pandas Frame for it
 else:
 	print("No file found for that show")
 
-# ---- MP3 file processing ---- #
-all_files = os.listdir()
-cur_dir = os.getcwd().rsplit('\\',1)[-1]
-print("Show date:",cur_dir)
-print("")
-
-for x in all_files:
-	if x.endswith('.mp3'):		#find and format each mp3 in the folder
-		mp3_list.append(x[:-4])
-		df = pd.DataFrame(data={"FileNames": mp3_list})
-		df.to_csv(cur_dir+"mp3s.csv", sep=',',index=False)
-
-#look at each songfile in mp3 list and search names omitting "a", "the", &c.
+get_mp3s()
 for file in mp3_list:
 	file_art, file_tit = [x.strip() for x in file.split("-")]
 	print("Examining file:",file_tit,"by",file_art)
@@ -81,18 +81,19 @@ for file in mp3_list:
 	art_contents = list(filter(lambda w: w not in stopwords, re.split(" ", file_art.lower())))
 	tit_contents = list(filter(lambda w: w not in stopwords, re.split(" ", file_tit.lower())))
 	print("Searching using artist name:",art_contents,"and title:",tit_contents)
-#Look over main show list and see if artist/title are in respective columns	
-	#print(DBase['Artist'])
-	#https://www.statology.org/pandas-get-index-of-row/
+    
+	#Look over main show list and see if artist/title are in respective columns	
 	for each in art_contents:
 		Base_Art = list(DBase["Artist"])
-		#print(art_contents)
-		#print(Base_Art[0])
-		print(list_contains(art_contents,Base_Art))
-		if (DBase['Artist'].str.contains(each,case=False).any()):
-			print("artist name found as",each)
-			found_artist = DBase.loc[DBase['Artist'].str.contains(each, case=False)]
-			#print(found_artist)
+		Base_Tit = list(DBase["Title"])
+		if (list_contains(art_contents,Base_Art)):
+			if (DBase['Artist'].str.contains(each,case=False).any()):
+				print("artist name found as",each)
+				found_artist = DBase.loc[DBase['Artist'].str.contains(each, case=False)]
+			#found_artist gives list of all titles for that artist
+			#maybe use same algorithm to search this list for the song title
+		#if (list_contains(tit_contents,Base_Tit)):
+		#	print(found_artist)
 			
 		#print(DBase['Artist'],DBase['Title'])
 		#	tit_index = DBase.index[DBase['Title'] == file_tit].tolist()
