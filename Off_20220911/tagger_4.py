@@ -18,7 +18,7 @@ mp3_list =[]
 show_DB = pd.DataFrame()
 episode_DB = pd.DataFrame()
 
-def list_contains(shortList, bigList):  #function to check if all items in one list are in another
+def list_contains(shortList, bigList):	#function to check if all items in one list are in another
 	listToStr = ' '.join([str(elem) for elem in shortList])
 	print("Search criteria: ",listToStr)
 	lowList = [x.lower() for x in bigList]
@@ -28,10 +28,10 @@ def list_contains(shortList, bigList):  #function to check if all items in one l
 			for item in low_contents:
 				doc.write("%s\n" % item)
 	for names in lowList:
-		print("Checking if",listToStr,"is a subset of",names)
-		print(lowList.index(names))
+		print("Checking if",listToStr,"is a subset of",names," at index",lowList.index(names))
 		if(set(listToStr).issubset(set(names))):
-			print("Confirming that",listToStr,"is subset of the main list")
+			print("Confirming that",listToStr,"is subset of the main list at index",lowList.index(names))
+			print("This has a value of ",set(listToStr))
 			break
 		#else:
 		#	print("No subset found")
@@ -81,11 +81,19 @@ for file in mp3_list:
 	art_contents = list(filter(lambda w: w not in stopwords, re.split(" ", file_art.lower())))
 	tit_contents = list(filter(lambda w: w not in stopwords, re.split(" ", file_tit.lower())))
 	print("Searching using artist name:",art_contents,"and title:",tit_contents)
-    
+	
 	#Look over main show list and see if artist/title are in respective columns	
 	for each in art_contents:
 		Base_Art = list(DBase["Artist"])
 		Base_Tit = list(DBase["Title"])
+		sampl_art = ["black" "keys"]
+		pattern = '|'.join(sampl_art)
+		print("looking for pattern",pattern)
+		DBase.Artist.str.contains(pattern)
+		#found_string = DBase.loc[DBase['Artist'].str.contains("the", case=False)]
+		#print("searching for 'black keys' in database ")
+		DBase['Artist'].apply(lambda x: any([k in x for k in sampl_art]))
+		#print(found_string)
 		if (list_contains(art_contents,Base_Art)):
 			if (DBase['Artist'].str.contains(each,case=False).any()):
 				print("artist name found as",each)
